@@ -340,6 +340,29 @@ def plot_markov_embudo(emb):
     ax.bar(['Publicado', 'Visto', 'Clic'], emb.B[:, 0])
     return fig
 
+def plot_funnel(emb):
+    fig, ax = plt.subplots(figsize=(8,4))
+
+    etapas = ['Publicado', 'Visto', 'Clic', 'Compra']
+
+    probs = [
+        1,
+        emb.pv,
+        emb.pv * emb.ctr,
+        emb.pv * emb.ctr * emb.cr
+    ]
+
+    ax.plot(etapas, probs, marker='o', linewidth=2)
+
+    ax.set_title("Embudo de conversión")
+    ax.set_ylabel("Probabilidad acumulada")
+    ax.grid(True)
+
+    for i, p in enumerate(probs):
+        ax.text(i, p, f"{p:.6f}", ha='center', va='bottom')
+
+    return fig
+
 def plot_markov_canal(canal):
     fig, ax = plt.subplots(figsize=(6, 4))
     ax.set_title("Distribución Estacionaria")
@@ -395,8 +418,9 @@ def main():
     df_sens = pd.DataFrame(filas)
 
     print("\nGenerando gráficas...")
-    plot_markov_embudo(emb)
+    #plot_markov_embudo(emb)
     plot_markov_canal(canal)
+    plot_funnel(emb)
     plot_convergencia_mc(df_a, df_b, df_c, df_d)
     plot_comparacion_escenarios(df_a, df_b, df_c, df_d)
     plot_sensibilidad(df_sens)
