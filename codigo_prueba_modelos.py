@@ -20,11 +20,12 @@ Original file is located at
     4. Análisis de Sensibilidad     → Robustez del modelo
 ============================================================
 """
-
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
+from concurrent.futures import ProcessPoolExecutor
 
 import seaborn as sns
 from scipy.linalg import solve
@@ -252,7 +253,6 @@ class MarkovEmbudo:
 # ─────────────────────────────────────────────────────────────
 
 class MarkovCanal:
-    #146.5
     ESTADOS = ['Bajo\n(<255 v/post)', 'Normal\n(~313 v/post)', 'Alto\n(>382 v/post)']
 
     def __init__(self, P_mat=None):
@@ -329,15 +329,34 @@ def simular_periodo(horario: list, ctr=None, cr=None, comision=None) -> dict:
         'ctr_real': arr[:, 1].sum() / v_tot if v_tot > 0 else 0, 'comisiones': round(arr[:, 3].sum(), 2),
     }
 
-def monte_carlo(horario: list, n: int = None, label: str = '', ctr=None, cr=None) -> pd.DataFrame:
+def _worker(args):
+    horario, ctr, cr = args
+    return simular_periodo(horario, ctr=ctr, cr=cr)
+
+def monte_carlo(horario: list,
+                n: int = None,
+                label: str = '',
+                ctr=None,
+                cr=None,
+                workers=None) -> pd.DataFrame:
+
     n = n or P.N_SIMS
-    resultados = [simular_periodo(horario, ctr=ctr, cr=cr) for _ in range(n)]
+
+    if workers is None:
+        workers = os.cpu_count()
+
+    args = [(horario, ctr, cr) for _ in range(n)]
+
+    with ProcessPoolExecutor(max_workers=workers) as ex:
+        resultados = list(ex.map(_worker, args))
+
     df = pd.DataFrame(resultados)
+
     df['sim'] = range(n)
     df['escenario'] = label
     df['media_acum_com'] = df['comisiones'].expanding().mean()
-    return df
 
+    return df
 
 # ─────────────────────────────────────────────────────────────
 #  SECCIÓN 5: VISUALIZACIONES
@@ -428,8 +447,8 @@ def main():
     df_sens = pd.DataFrame(filas)
 
     print("\nGenerando gráficas...")
-    plot_markov_canal(canal)
     plot_funnel_counts(emb)
+    plot_markov_canal(canal)
     plot_convergencia_mc(df_a, df_b, df_c, df_d)
     plot_comparacion_escenarios(df_a, df_b, df_c, df_d)
     plot_sensibilidad(df_sens)
