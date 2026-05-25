@@ -340,26 +340,33 @@ def plot_markov_embudo(emb):
     ax.bar(['Publicado', 'Visto', 'Clic'], emb.B[:, 0])
     return fig
 
-def plot_funnel(emb):
+def plot_funnel_counts(emb, subs=4946):
     fig, ax = plt.subplots(figsize=(8,4))
 
-    etapas = ['Publicado', 'Visto', 'Clic', 'Compra']
-
-    probs = [
-        1,
-        emb.pv,
-        emb.pv * emb.ctr,
-        emb.pv * emb.ctr * emb.cr
+    etapas = [
+        'Subscriptores',
+        'Vistas',
+        'Clicks',
+        'Compras'
     ]
 
-    ax.plot(etapas, probs, marker='o', linewidth=2)
+    valores = [
+        subs,
+        subs * emb.pv,
+        subs * emb.pv * emb.ctr,
+        subs * emb.pv * emb.ctr * emb.cr
+    ]
 
-    ax.set_title("Embudo de conversión")
-    ax.set_ylabel("Probabilidad acumulada")
+    ax.plot(etapas, valores, marker='o', linewidth=2)
+
+    ax.set_title("Embudo de conversión esperado")
+    ax.set_ylabel("Cantidad esperada")
+
+    for i, v in enumerate(valores):
+        ax.text(i, v, f"{v:.2f}",
+                ha='center', va='bottom')
+
     ax.grid(True)
-
-    for i, p in enumerate(probs):
-        ax.text(i, p, f"{p:.6f}", ha='center', va='bottom')
 
     return fig
 
@@ -420,11 +427,11 @@ def main():
     print("\nGenerando gráficas...")
     #plot_markov_embudo(emb)
     plot_markov_canal(canal)
-    plot_funnel(emb)
-    plot_convergencia_mc(df_a, df_b, df_c, df_d)
-    plot_comparacion_escenarios(df_a, df_b, df_c, df_d)
-    plot_sensibilidad(df_sens)
+    plot_funnel_counts(emb)
+    #plot_convergencia_mc(df_a, df_b, df_c, df_d)
+    #plot_comparacion_escenarios(df_a, df_b, df_c, df_d)
+    #plot_sensibilidad(df_sens)
     plt.show()
-
+    
 if __name__ == "__main__":
     main()
