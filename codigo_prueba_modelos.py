@@ -173,14 +173,15 @@ class P:
     }
 
     P_MAT = np.array([
-        [0.625, 0.375, 0],
-        [0.031, 0.937, 0.031],
+        [0.692, 0.308, 0.000],
+        [0.171, 0.658, 0.171],
         [0.000, 0.500, 0.500],
     ])
 #          Bajo  Normal   Alto
-# Bajo    0.625   0.375  0.000
-# Normal  0.031   0.937  0.031
+# Bajo    0.692   0.308  0.000
+# Normal  0.171   0.658  0.171
 # Alto    0.000   0.500  0.500
+
 
     # ── Simulacion ─────────────────────────────────────────────
     DIAS_SIM          = 30
@@ -251,7 +252,8 @@ class MarkovEmbudo:
 # ─────────────────────────────────────────────────────────────
 
 class MarkovCanal:
-    ESTADOS = ['Bajo\n(<3%)', 'Normal\n(3-6%)', 'Alto\n(>6%)']
+    #146.5
+    ESTADOS = ['Bajo\n(<255 v/post)', 'Normal\n(~313 v/post)', 'Alto\n(>382 v/post)']
 
     def __init__(self, P_mat=None):
         if P_mat is None:
