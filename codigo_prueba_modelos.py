@@ -200,6 +200,7 @@ class MarkovEmbudo:
         self.pv = p_vista if p_vista is not None else P.P_VISTA
         self.ctr = ctr if ctr is not None else P.CTR
         self.cr = cr if cr is not None else P.CR
+        print(self.pv*self.ctr*self.cr)
         self._build()
 
     def _build(self):
@@ -334,12 +335,6 @@ def monte_carlo(horario: list, n: int = None, label: str = '', ctr=None, cr=None
 #  SECCIÓN 5: VISUALIZACIONES
 # ─────────────────────────────────────────────────────────────
 
-def plot_markov_embudo(emb):
-    fig, ax = plt.subplots(figsize=(6, 4))
-    ax.set_title("Probabilidad de absorción")
-    ax.bar(['Publicado', 'Visto', 'Clic'], emb.B[:, 0])
-    return fig
-
 def plot_funnel_counts(emb, subs=4946):
     fig, ax = plt.subplots(figsize=(8,4))
 
@@ -425,7 +420,6 @@ def main():
     df_sens = pd.DataFrame(filas)
 
     print("\nGenerando gráficas...")
-    #plot_markov_embudo(emb)
     plot_markov_canal(canal)
     plot_funnel_counts(emb)
     #plot_convergencia_mc(df_a, df_b, df_c, df_d)
