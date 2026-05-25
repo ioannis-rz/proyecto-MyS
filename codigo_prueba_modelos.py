@@ -7,10 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1RTcNl-mfRkiaoFYcN1wRK83peiNOcl94
 """
 
-# -*- coding: utf-8 -*-
-import sys
-import io
-
 """
 ============================================================
   PROMO HUNTER — Modelo de Simulación
@@ -175,6 +171,16 @@ class P:
         'salud/belleza': 0.205,
         'tecnologia':    0.155,
     }
+
+    P_MAT = np.array([
+        [0.625, 0.375, 0],
+        [0.031, 0.937, 0.031],
+        [0.000, 0.500, 0.500],
+    ])
+#          Bajo  Normal   Alto
+# Bajo    0.625   0.375  0.000
+# Normal  0.031   0.937  0.031
+# Alto    0.000   0.500  0.500
 
     # ── Simulacion ─────────────────────────────────────────────
     DIAS_SIM          = 30
@@ -397,7 +403,7 @@ def plot_sensibilidad(df_sens):
 def main():
     emb = MarkovEmbudo()
     emb.print_resumen()
-    canal = MarkovCanal()
+    canal = MarkovCanal(P.P_MAT)
     canal.print_resumen()
 
     df_a = monte_carlo(P.HORARIO_BASE,  label="A")
@@ -422,9 +428,9 @@ def main():
     print("\nGenerando gráficas...")
     plot_markov_canal(canal)
     plot_funnel_counts(emb)
-    #plot_convergencia_mc(df_a, df_b, df_c, df_d)
-    #plot_comparacion_escenarios(df_a, df_b, df_c, df_d)
-    #plot_sensibilidad(df_sens)
+    plot_convergencia_mc(df_a, df_b, df_c, df_d)
+    plot_comparacion_escenarios(df_a, df_b, df_c, df_d)
+    plot_sensibilidad(df_sens)
     plt.show()
     
 if __name__ == "__main__":
